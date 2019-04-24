@@ -1,0 +1,3 @@
+---
+- name: restart filebeat-external
+  service: name=filebeat-external state=restarted

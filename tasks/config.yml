@@ -1,0 +1,28 @@
+---
+- name: Copy Filebeat configuration.
+  template:
+    src: filebeat.yml.j2
+    dest: "/etc/filebeat-external/filebeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart filebeat-external
+
+- name: Ensure Filebeat SSL key pair directory exists.
+  file:
+    path: "{{ filebeat_external_ssl_dir }}"
+    state: directory
+  when: filebeat_ssl_key is defined
+
+- name: Copy SSL key and cert for filebeat.
+  copy:
+    src: "{{ item }}"
+    dest: "{{ filebeat_external_ssl_dir }}/{{ item | basename }}"
+    mode: 0644
+  with_items:
+    - "{{ filebeat_external_ssl_key }}"
+    - "{{ filebeat_external_ssl_certificate }}"
+  notify: restart filebeat-external
+  when: filebeat_external_ssl_key and filebeat_external_ssl_certificate
+
+- debug: msg="{{ ansible_service_mgr }}"

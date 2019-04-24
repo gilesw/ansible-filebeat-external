@@ -1,0 +1,41 @@
+---
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Install Filebeat.
+  package: name=filebeat state=present
+
+- name: Copy initscript
+  copy:
+    src: "etc/init.d/filebeat-external"
+    dest: "/etc/init.d/filebeat-external"
+    mode: 0755
+  when: ansible_service_mgr == 'sysvinit' or ansible_service_mgr == 'upstart'
+
+- name: hardlink process so the initscript can kill it off
+  file:
+    src: /usr/share/filebeat/bin/filebeat
+    dest: /usr/share/filebeat/bin/filebeat-external
+    state: hard
+
+- include: config.yml
+  when: filebeat_external_create_config
+
+- name: ensure service starts up on boot
+  sysvinit:
+    name: filebeat-external
+    state: started
+    enabled: yes
+    runlevels:
+      - 3
+      - 5
+  when: ansible_service_mgr == 'sysvinit' or ansible_service_mgr == 'upstart'
+
+- name: Ensure Filebeat is started and enabled at boot.
+  service:
+    name: filebeat-external
+    state: started
+    enabled: yes

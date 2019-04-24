@@ -1,0 +1,30 @@
+---
+filebeat_external_create_config: true
+
+filebeat_external_inputs:
+  - type: log
+    paths:
+      - "/var/log/*.log"
+
+filebeat_external_output_elasticsearch_enabled: false
+filebeat_external_output_elasticsearch_hosts:
+  - "localhost:9200"
+
+filebeat_external_output_logstash_enabled: true
+filebeat_external_output_logstash_hosts:
+  - "localhost:5044"
+
+filebeat_external_enable_logging: true
+filebeat_external_log_level: warning
+filebeat_external_log_dir: /var/log/filebeat-external
+filebeat_external_log_filename: filebeat.log
+
+filebeat_external_ssl_dir: /etc/pki/graylog2
+filebeat_external_ssl_certificate: false
+filebeat_external_ssl_key: false
+filebeat_external_ssl_insecure: "false"
+filebeat_external_enable_multiline: "true"
+
+filebeat_external_ssl_enabled: 'false'
+filebeat_external_ssl_verification_mode: none
+filebeat_external_ssl_certificate_authorities: false
